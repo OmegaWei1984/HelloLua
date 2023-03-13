@@ -9,9 +9,11 @@ assert(getmetatable(t) == t1)
 assert(t.foo == nil)
 assert(t1.foo ~= nil)
 
+local mt = {}
 Set = {}
 function Set.new(l)
     local set = {}
+    setmetatable(set, mt)
     for _, v in ipairs(l) do
         set[v] = true
     end
@@ -27,3 +29,23 @@ function Set.union(a, b)
     end
     return res
 end
+function Set.intersection(a, b)
+    local res = Set.new{}
+    for k in pairs(a) do
+        res[k] = b[k]
+    end
+    return res
+end
+function Set.toString(set)
+    local l = {}
+    for key in pairs(set) do
+        l[#l + 1] = tostring(key)
+    end
+    return "{"..table.concat(l, ", ").."}"
+end
+mt.__add = Set.union
+
+local s1 = Set.new({1, 2, 3, 4, 5})
+local s2 = Set.new({1, 3, 5, 7})
+local s3 = s1 + s2
+print(Set.toString(s3))
